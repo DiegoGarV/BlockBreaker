@@ -10,6 +10,16 @@ function love.load()
         speed = 400
     }
 
+    ball = {
+        x = 400,
+        y = 300,
+        radius = 10,
+        speedX = 0,
+        speedY = 200,
+        speedIncrease = 1.10,
+        maxSpeed = 700
+    }
+
     print("El juego inició correctamente")
 end
 
@@ -31,6 +41,59 @@ function love.update(dt)
         paddle.x = love.graphics.getWidth() - paddle.width
     end
 
+    -- Movimiento de la pelota
+    ball.x = ball.x + ball.speedX * dt
+    ball.y = ball.y + ball.speedY * dt
+
+    if ball.x - ball.radius <= 0 then
+        ball.x = ball.radius
+        ball.speedX = -ball.speedX
+    end
+
+    if ball.x + ball.radius >= love.graphics.getWidth() then
+        ball.x = love.graphics.getWidth() - ball.radius
+        ball.speedX = -ball.speedX
+    end
+
+    if ball.y - ball.radius <= 0 then
+        ball.y = ball.radius
+        ball.speedY = -ball.speedY
+    end
+
+    if ball.y - ball.radius >= love.graphics.getHeight() then
+        print("Game Over")
+        love.event.quit()
+    end
+
+    -- Interacción pelota/paddle
+    local ballTouchesPaddle =
+        ball.x + ball.radius >= paddle.x and
+        ball.x - ball.radius <= paddle.x + paddle.width and
+        ball.y + ball.radius >= paddle.y and
+        ball.y - ball.radius <= paddle.y + paddle.height
+
+    if ballTouchesPaddle and ball.speedY > 0 then
+        ball.y = paddle.y - ball.radius
+        ball.speedY = -ball.speedY
+
+        local paddleCenter = paddle.x + paddle.width / 2
+        local distanceFromCenter = ball.x - paddleCenter
+        local normalizedDistance = distanceFromCenter / (paddle.width / 2)
+
+        ball.speedX = normalizedDistance * math.abs(ball.speedY)
+
+        ball.speedX = ball.speedX * ball.speedIncrease
+        ball.speedY = ball.speedY * ball.speedIncrease
+
+        ball.speedX = math.max(
+            -ball.maxSpeed,
+            math.min(ball.speedX, ball.maxSpeed)
+        )
+        ball.speedY = math.max(
+            -ball.maxSpeed,
+            math.min(ball.speedY, ball.maxSpeed)
+        )
+    end
 end
 
 function love.draw()
@@ -45,5 +108,15 @@ function love.draw()
         paddle.y,
         paddle.width,
         paddle.height
+    )
+
+    -- Pelota
+    love.graphics.setColor(1, 0.3, 0.3)
+
+    love.graphics.circle(
+        "fill",
+        ball.x,
+        ball.y,
+        ball.radius
     )
 end
