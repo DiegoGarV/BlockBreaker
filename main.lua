@@ -1,3 +1,13 @@
+function createBlock(x, y, width, height, color)
+    return {
+        x = x,
+        y = y,
+        width = width,
+        height = height,
+        color = color
+    }
+end
+
 function love.load()
     love.window.setTitle("Block Breaker")
     love.window.setMode(800, 600)
@@ -18,6 +28,13 @@ function love.load()
         speedY = 200,
         speedIncrease = 1.10,
         maxSpeed = 700
+    }
+
+    blocks = {
+        createBlock(100, 100, 120, 30, {1, 0.2, 0.2}),
+        createBlock(240, 100, 120, 30, {0.2, 1, 0.2}),
+        createBlock(380, 100, 120, 30, {0.2, 0.4, 1}),
+        createBlock(520, 100, 120, 30, {1, 0.8, 0.2}),
     }
 
     print("El juego inició correctamente")
@@ -60,11 +77,6 @@ function love.update(dt)
         ball.speedY = -ball.speedY
     end
 
-    if ball.y - ball.radius >= love.graphics.getHeight() then
-        print("Game Over")
-        love.event.quit()
-    end
-
     -- Interacción pelota/paddle
     local ballTouchesPaddle =
         ball.x + ball.radius >= paddle.x and
@@ -94,6 +106,35 @@ function love.update(dt)
             math.min(ball.speedY, ball.maxSpeed)
         )
     end
+
+    -- Interacción pelota/bloques
+    for i = #blocks, 1, -1 do
+        local block = blocks[i]
+
+        local ballTouchesBlock =
+        ball.x + ball.radius >= block.x and
+        ball.x - ball.radius <= block.x + block.width and
+        ball.y + ball.radius >= block.y and
+        ball.y - ball.radius <= block.y + block.height
+
+        if ballTouchesBlock then
+            ball.speedY = -ball.speedY
+            table.remove(blocks, i)
+            break
+        end
+    end
+
+    -- Ganar
+    if #blocks == 0 then
+        print("You Win!")
+        love.event.quit()
+    end
+
+    -- Perder
+    if ball.y - ball.radius >= love.graphics.getHeight() then
+        print("Game Over")
+        love.event.quit()
+    end
 end
 
 function love.draw()
@@ -119,4 +160,21 @@ function love.draw()
         ball.y,
         ball.radius
     )
+
+    -- Bloques
+    for _, block in ipairs(blocks) do
+        love.graphics.setColor(
+            block.color[1],
+            block.color[2],
+            block.color[3]
+        )
+
+        love.graphics.rectangle(
+            "fill",
+            block.x,
+            block.y,
+            block.width,
+            block.height
+        )
+    end
 end
