@@ -8,6 +8,37 @@ function createBlock(x, y, width, height, color)
     }
 end
 
+function blockGrid(rows, columns, colors)
+    local newBlocks = {}
+    local screenWidth = love.graphics.getWidth()
+    local screenHeight = love.graphics.getHeight()
+    local gridHeight = screenHeight * (7/12)
+    local blockWidth = screenWidth / columns
+    local blockHeight = gridHeight / rows
+
+    for row = 1, rows do
+        local colorIndex = ((row - 1) % #colors) + 1
+        local rowColor = colors[colorIndex]
+
+        for column = 1, columns do
+            local blockX = (column - 1) * blockWidth
+            local blockY = (row - 1) * blockHeight
+
+            local block = createBlock(
+                blockX,
+                blockY,
+                blockWidth,
+                blockHeight,
+                rowColor
+            )
+
+            table.insert(newBlocks, block)
+        end
+    end
+
+    return newBlocks
+end
+
 function love.load()
     love.window.setTitle("Block Breaker")
     love.window.setMode(800, 600)
@@ -22,20 +53,22 @@ function love.load()
 
     ball = {
         x = 400,
-        y = 300,
+        y = 520,
         radius = 10,
         speedX = 0,
         speedY = 200,
-        speedIncrease = 1.10,
+        speedIncrease = 1.0,
         maxSpeed = 700
     }
 
-    blocks = {
-        createBlock(100, 100, 120, 30, {1, 0.2, 0.2}),
-        createBlock(240, 100, 120, 30, {0.2, 1, 0.2}),
-        createBlock(380, 100, 120, 30, {0.2, 0.4, 1}),
-        createBlock(520, 100, 120, 30, {1, 0.8, 0.2}),
+    local blockColors = {
+        {1, 0.2, 0.2},
+        {0.2, 1, 0.2},
+        {0.2, 0.4, 1},
+        {1, 0.8, 0.2}
     }
+
+    blocks = blockGrid(6, 8, blockColors)
 
     print("El juego inició correctamente")
 end
@@ -118,7 +151,32 @@ function love.update(dt)
         ball.y - ball.radius <= block.y + block.height
 
         if ballTouchesBlock then
-            ball.speedY = -ball.speedY
+            local overlapLeft = (ball.x + ball.radius) - block.x
+            local overlapRight = (block.x + block.width) - (ball.x - ball.radius)
+            local overlapTop = (ball.y + ball.radius) - block.y
+            local overlapBottom = (block.y + block.height) - (ball.y - ball.radius)
+
+            local smallestOverlap = math.min(
+                overlapLeft,
+                overlapRight,
+                overlapTop,
+                overlapBottom
+            )
+
+            if smallestOverlap == overlapLeft then
+                ball.x = block.x - ball.radius
+                ball.speedX = -math.abs(ball.speedX)
+            elseif smallestOverlap == overlapRight then
+                ball.x = block.x + block.width + ball.radius
+                ball.speedX = math.abs(ball.speedX)
+            elseif smallestOverlap == overlapTop then
+                ball.y = block.y - ball.radius
+                ball.speedY = -math.abs(ball.speedY)
+            elseif smallestOverlap == overlapBottom then
+                ball.y = block.y + block.height + ball.radius
+                ball.speedY = math.abs(ball.speedY)
+            end
+
             table.remove(blocks, i)
             break
         end
@@ -171,6 +229,16 @@ function love.draw()
 
         love.graphics.rectangle(
             "fill",
+            block.x,
+            block.y,
+            block.width,
+            block.height
+        )
+
+        love.graphics.setColor(0, 0, 0)
+
+        love.graphics.rectangle(
+            "line",
             block.x,
             block.y,
             block.width,
