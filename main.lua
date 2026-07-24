@@ -8,21 +8,28 @@ function createBlock(x, y, width, height, color)
     }
 end
 
-function blockGrid(rows, columns, colors)
+function blockGrid(rows, columns, colors, margins)
     local newBlocks = {}
     local screenWidth = love.graphics.getWidth()
     local screenHeight = love.graphics.getHeight()
-    local gridHeight = screenHeight * (7/12)
-    local blockWidth = screenWidth / columns
-    local blockHeight = gridHeight / rows
+    margins = margins or {}
+    local left = margins.left or 0
+    local right = margins.right or 0
+    local top = margins.top or 0
+    local bottom = margins.bottom or 0
+    local gridAreaHeight = screenHeight * (7/12)
+    local availableWidth = screenWidth - left - right
+    local availableHeight = gridAreaHeight - top - bottom
+    local blockWidth = availableWidth / columns
+    local blockHeight = availableHeight / rows
 
     for row = 1, rows do
         local colorIndex = ((row - 1) % #colors) + 1
         local rowColor = colors[colorIndex]
 
         for column = 1, columns do
-            local blockX = (column - 1) * blockWidth
-            local blockY = (row - 1) * blockHeight
+            local blockX = left + (column - 1) * blockWidth
+            local blockY = top + (row - 1) * blockHeight
 
             local block = createBlock(
                 blockX,
@@ -57,7 +64,7 @@ function love.load()
         radius = 10,
         speedX = 0,
         speedY = 200,
-        speedIncrease = 1.0,
+        speedIncrease = 1.10,
         maxSpeed = 700
     }
 
@@ -68,7 +75,7 @@ function love.load()
         {1, 0.8, 0.2}
     }
 
-    blocks = blockGrid(6, 8, blockColors)
+    blocks = blockGrid(6, 8, blockColors, {top = 40, left = 40, right = 40})
 
     print("El juego inició correctamente")
 end
