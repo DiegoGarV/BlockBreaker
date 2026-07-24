@@ -46,24 +46,24 @@ function blockGrid(rows, columns, colors, margins)
     return newBlocks
 end
 
-function love.load()
-    love.window.setTitle("Block Breaker")
-    love.window.setMode(800, 600)
+function resetGame()
+    local screenWidth = love.graphics.getWidth()
+    local screenHeight = love.graphics.getHeight()
 
     paddle = {
         width = 120,
         height = 20,
-        x = 340,
-        y = 540,
+        x = screenWidth / 2 - 120 / 2,
+        y = screenHeight - 60,
         speed = 400
     }
 
     ball = {
-        x = 400,
-        y = 520,
+        x = screenWidth / 2,
+        y = screenHeight - 80,
         radius = 10,
         speedX = 0,
-        speedY = 200,
+        speedY = -200,
         speedIncrease = 1.10,
         maxSpeed = 700
     }
@@ -77,10 +77,117 @@ function love.load()
 
     blocks = blockGrid(6, 8, blockColors, {top = 40, left = 40, right = 40})
 
+    gameState = "playing"
+end
+
+function drawGame()
+    -- Paddle
+    love.graphics.setColor(1, 1, 1)
+
+    love.graphics.rectangle(
+        "fill",
+        paddle.x,
+        paddle.y,
+        paddle.width,
+        paddle.height
+    )
+
+    -- Pelota
+    love.graphics.setColor(1, 0.3, 0.3)
+
+    love.graphics.circle(
+        "fill",
+        ball.x,
+        ball.y,
+        ball.radius
+    )
+
+    -- Bloques
+    love.graphics.setLineWidth(2)
+
+    for _, block in ipairs(blocks) do
+        love.graphics.setColor(
+            block.color[1],
+            block.color[2],
+            block.color[3]
+        )
+
+        love.graphics.rectangle(
+            "fill",
+            block.x,
+            block.y,
+            block.width,
+            block.height
+        )
+
+        love.graphics.setColor(0, 0, 0)
+
+        love.graphics.rectangle(
+            "line",
+            block.x,
+            block.y,
+            block.width,
+            block.height
+        )
+    end
+end
+
+function drawEndScreen(message, messageColor)
+    local screenWidth = love.graphics.getWidth()
+    local screenHeight = love.graphics.getHeight()
+
+    love.graphics.setFont(titleFont)
+
+    love.graphics.setColor(
+        messageColor[1],
+        messageColor[2],
+        messageColor[3]
+    )
+
+    love.graphics.printf(
+        message,
+        0,
+        screenHeight / 2 - 100,
+        screenWidth,
+        "center"
+    )
+
+    love.graphics.setFont(optionFont)
+    love.graphics.setColor(1, 1, 1)
+
+    love.graphics.printf(
+        "Press 'R' to replay",
+        0,
+        screenHeight / 2,
+        screenWidth,
+        "center"
+    )
+
+    love.graphics.printf(
+        "Press 'Q' to quit",
+        0,
+        screenHeight / 2 + 50,
+        screenWidth,
+        "center"
+    )
+end
+
+function love.load()
+    love.window.setTitle("Block Breaker")
+    love.window.setMode(800, 600)
+
+    titleFont = love.graphics.newFont(48)
+    optionFont = love.graphics.newFont(24)
+
+    resetGame()
     print("El juego inició correctamente")
 end
 
 function love.update(dt)
+    if gameState ~= "playing" then
+        return
+    end
+
     -- Movimiento del paddle
     if love.keyboard.isDown("a") or love.keyboard.isDown("left") then
         paddle.x = paddle.x - paddle.speed * dt
@@ -191,65 +298,35 @@ function love.update(dt)
 
     -- Ganar
     if #blocks == 0 then
-        print("You Win!")
-        love.event.quit()
+        gameState = "won"
     end
 
     -- Perder
     if ball.y - ball.radius >= love.graphics.getHeight() then
-        print("Game Over")
-        love.event.quit()
+        gameState = "lost"
+    end
+end
+
+function love.keypressed(key)
+    if gameState == "won" or gameState == "lost" then
+        if key == "r" then
+            resetGame()
+        elseif key == "q" then
+            love.event.quit()
+        end
     end
 end
 
 function love.draw()
-    love.graphics.clear(0.1, 0.1, 0.15)
+    function love.draw()
+        love.graphics.clear(0.1, 0.1, 0.15)
 
-    -- Paddle
-    love.graphics.setColor(1, 1, 1)
-
-    love.graphics.rectangle(
-        "fill",
-        paddle.x,
-        paddle.y,
-        paddle.width,
-        paddle.height
-    )
-
-    -- Pelota
-    love.graphics.setColor(1, 0.3, 0.3)
-
-    love.graphics.circle(
-        "fill",
-        ball.x,
-        ball.y,
-        ball.radius
-    )
-
-    -- Bloques
-    for _, block in ipairs(blocks) do
-        love.graphics.setColor(
-            block.color[1],
-            block.color[2],
-            block.color[3]
-        )
-
-        love.graphics.rectangle(
-            "fill",
-            block.x,
-            block.y,
-            block.width,
-            block.height
-        )
-
-        love.graphics.setColor(0, 0, 0)
-
-        love.graphics.rectangle(
-            "line",
-            block.x,
-            block.y,
-            block.width,
-            block.height
-        )
+        if gameState == "playing" then
+            drawGame()
+        elseif gameState == "won" then
+            drawEndScreen("You Win!", {0.2, 1, 0.3})
+        elseif gameState == "lost" then
+            drawEndScreen("Game Over", {1, 0.2, 0.2})
+        end
     end
 end
