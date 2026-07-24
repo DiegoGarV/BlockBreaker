@@ -83,7 +83,6 @@ end
 function drawGame()
     -- Paddle
     love.graphics.setColor(1, 1, 1)
-
     love.graphics.rectangle(
         "fill",
         paddle.x,
@@ -94,7 +93,6 @@ function drawGame()
 
     -- Pelota
     love.graphics.setColor(1, 0.3, 0.3)
-
     love.graphics.circle(
         "fill",
         ball.x,
@@ -104,14 +102,12 @@ function drawGame()
 
     -- Bloques
     love.graphics.setLineWidth(2)
-
     for _, block in ipairs(blocks) do
         love.graphics.setColor(
             block.color[1],
             block.color[2],
             block.color[3]
         )
-
         love.graphics.rectangle(
             "fill",
             block.x,
@@ -121,7 +117,6 @@ function drawGame()
         )
 
         love.graphics.setColor(0, 0, 0)
-
         love.graphics.rectangle(
             "line",
             block.x,
@@ -137,13 +132,11 @@ function drawEndScreen(message, messageColor)
     local screenHeight = love.graphics.getHeight()
 
     love.graphics.setFont(titleFont)
-
     love.graphics.setColor(
         messageColor[1],
         messageColor[2],
         messageColor[3]
     )
-
     love.graphics.printf(
         message,
         0,
@@ -154,7 +147,6 @@ function drawEndScreen(message, messageColor)
 
     love.graphics.setFont(optionFont)
     love.graphics.setColor(1, 1, 1)
-
     love.graphics.printf(
         "Press 'R' to replay",
         0,
@@ -162,7 +154,6 @@ function drawEndScreen(message, messageColor)
         screenWidth,
         "center"
     )
-
     love.graphics.printf(
         "Press 'Q' to quit",
         0,
