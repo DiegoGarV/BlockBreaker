@@ -309,15 +309,13 @@ function love.keypressed(key)
 end
 
 function love.draw()
-    function love.draw()
-        love.graphics.clear(0.1, 0.1, 0.15)
+    love.graphics.clear(0.1, 0.1, 0.15)
 
-        if gameState == "playing" then
-            drawGame()
-        elseif gameState == "won" then
-            drawEndScreen("You Win!", {0.2, 1, 0.3})
-        elseif gameState == "lost" then
-            drawEndScreen("Game Over", {1, 0.2, 0.2})
-        end
+    if gameState == "playing" then
+        drawGame()
+    elseif gameState == "won" then
+        drawEndScreen("You Win!", {0.2, 1, 0.3})
+    elseif gameState == "lost" then
+        drawEndScreen("Game Over", {1, 0.2, 0.2})
     end
 end
