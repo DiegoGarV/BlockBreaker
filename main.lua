@@ -1,6 +1,7 @@
 local Scene = require("src.ecs.Scene")
 local GameSetupSystem = require("src.systems.GameSetupSystem")
 local RenderSystem = require("src.systems.RenderSystem")
+local PaddleControlSystem = require("src.systems.PaddleControlSystem")
 
 local scene
 
@@ -13,6 +14,7 @@ function love.load()
     -- Sistemas
     scene:addSystem(GameSetupSystem)
     scene:addSystem(RenderSystem)
+    scene:addSystem(PaddleControlSystem)
 
     scene:setup()
 
