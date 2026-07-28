@@ -180,6 +180,13 @@ function GameSetupSystem.reset(scene)
         registry:destroy(entity)
     end
 
+    -- Eliminar eventos de teclado
+    for _, entity in ipairs(
+        registry:query("keyPressed")
+    ) do
+        registry:destroy(entity)
+    end
+
     registry:spawn({
         game = {
             state = "playing"

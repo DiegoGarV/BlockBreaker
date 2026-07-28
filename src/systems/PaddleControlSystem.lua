@@ -3,8 +3,15 @@ local PaddleControlSystem = {}
 function PaddleControlSystem.update(scene, dt)
     local registry = scene.registry
     local _, game = registry:first("game")
+    local _, input = registry:first("input")
 
     if not game or game.state ~= "playing" then
+        return
+    end
+
+    if not input then
+        -- Debug
+        print("Error: no se encontró el componente input")
         return
     end
 
@@ -17,17 +24,7 @@ function PaddleControlSystem.update(scene, dt)
             "paddle"
         )
     do
-        local direction = 0
-
-        if love.keyboard.isDown("a") or love.keyboard.isDown("left") then
-            direction = direction - 1
-        end
-
-        if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
-            direction = direction + 1
-        end
-
-        position.x = position.x + direction * paddle.speed * dt
+        position.x = position.x + input.paddleDirection * paddle.speed * dt
 
         if position.x < 0 then
             position.x = 0

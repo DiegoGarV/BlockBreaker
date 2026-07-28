@@ -125,7 +125,7 @@ function RenderSystem.draw(scene)
 
     if not game then
         -- Debug
-        print("Error: no se encontró un juego activo")
+        print("Error: no se encontró el estado del juego")
         return
     end
 

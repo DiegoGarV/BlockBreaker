@@ -1,5 +1,6 @@
 local Scene = require("src.ecs.Scene")
 local GameSetupSystem = require("src.systems.GameSetupSystem")
+local InputSystem = require("src.systems.InputSystem")
 local PaddleControlSystem = require("src.systems.PaddleControlSystem")
 local BallMovementSystem = require("src.systems.BallMovementSystem")
 local WallCollisionSystem = require("src.systems.WallCollisionSystem")
@@ -18,6 +19,7 @@ function love.load()
 
     -- Sistemas
     scene:addSystem(GameSetupSystem)
+    scene:addSystem(InputSystem)
     scene:addSystem(PaddleControlSystem)
     scene:addSystem(BallMovementSystem)
     scene:addSystem(WallCollisionSystem)
@@ -33,6 +35,10 @@ end
 
 function love.update(dt)
     scene:update(dt)
+end
+
+function love.keypressed(key)
+    scene.registry:spawn({keyPressed = {key = key}})
 end
 
 function love.draw()
