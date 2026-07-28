@@ -1,5 +1,7 @@
 local Scene = require("src.ecs.Scene")
 
+local GameSetupSystem = require("src.systems.GameSetupSystem")
+
 local scene
 
 function love.load()
@@ -8,25 +10,22 @@ function love.load()
 
     scene = Scene.new("testLevel")
 
+    scene:addSystem(GameSetupSystem)
+
+    scene:setup()
+
     print("Escena creada: " .. scene.name)
 
-    local testEntity = scene.registry:spawn({
-        position = {
-            x = 100,
-            y = 200
-        },
+    -- Pruebas del GameSetupSystem
+    local paddleEntities = scene.registry:query("paddle")
+    local ballEntities = scene.registry:query("ball")
+    local blockEntities = scene.registry:query("block")
+    local gameEntity, game = scene.registry:first("game")
 
-        test = {
-            message = "Entidad funcionando"
-        }
-    })
-
-    print("Entidad creada: " .. testEntity)
-
-    local position = scene.registry:get(testEntity, "position")
-
-    print("Posición X: " .. position.x)
-    print("Posición Y: " .. position.y)
+    print("Paddles creados: " .. #paddleEntities)
+    print("Pelotas creadas: " .. #ballEntities)
+    print("Bloques creados: " .. #blockEntities)
+    print("Estado del juego: " .. game.state)
 end
 
 function love.update(dt)
