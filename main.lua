@@ -1,6 +1,6 @@
 local Scene = require("src.ecs.Scene")
-
 local GameSetupSystem = require("src.systems.GameSetupSystem")
+local RenderSystem = require("src.systems.RenderSystem")
 
 local scene
 
@@ -10,7 +10,9 @@ function love.load()
 
     scene = Scene.new("testLevel")
 
+    -- Sistemas
     scene:addSystem(GameSetupSystem)
+    scene:addSystem(RenderSystem)
 
     scene:setup()
 
@@ -33,7 +35,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.clear(0.1, 0.1, 0.15)
+    scene:draw()
 end
 
 function love.quit()
