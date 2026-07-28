@@ -1,4 +1,4 @@
-local RenderSystem = {}
+local LevelRenderSystem = {}
 
 local function drawGame(registry)
     -- Dibuja paddle y bloques
@@ -116,7 +116,7 @@ local function drawEndScreen(registry, message, messageColor)
     )
 end
 
-function RenderSystem.draw(scene)
+function LevelRenderSystem.draw(scene)
     local registry = scene.registry
 
     love.graphics.clear(0.1, 0.1, 0.15)
@@ -151,4 +151,4 @@ function RenderSystem.draw(scene)
     love.graphics.setLineWidth(1)
 end
 
-return RenderSystem
+return LevelRenderSystem
