@@ -159,21 +159,27 @@ end
 function GameSetupSystem.reset(scene)
     local registry = scene.registry
 
-    -- Elimina todas las entidades registradas.
+    -- Elimina todas las entidades registradas
     for _, entity in ipairs(
         registry:query("position")
     ) do
         registry:destroy(entity)
     end
 
-    -- Elimina también la entidad global del juego.
+    -- Elimina la entidad global del juego
     for _, entity in ipairs(
         registry:query("game")
     ) do
         registry:destroy(entity)
     end
 
-    -- Entidad global con el estado de la partida.
+    -- Eliminar posibles eventos de derrota
+    for _, entity in ipairs(
+        registry:query("loseRequest")
+    ) do
+        registry:destroy(entity)
+    end
+
     registry:spawn({
         game = {
             state = "playing"
@@ -204,6 +210,15 @@ function GameSetupSystem.reset(scene)
 end
 
 function GameSetupSystem.setup(scene)
+    local registry = scene.registry
+
+    registry:spawn({
+        ui = {
+            titleFont = love.graphics.newFont(48),
+            optionFont = love.graphics.newFont(24)
+        }
+    })
+
     GameSetupSystem.reset(scene)
 
     -- Debug

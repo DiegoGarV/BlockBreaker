@@ -2,17 +2,10 @@ local WallCollisionSystem = {}
 
 function WallCollisionSystem.update(scene, dt)
     local registry = scene.registry
-
-    local _, game = registry:first("game")
-
-    if not game or game.state ~= "playing" then
-        return
-    end
-
     local screenWidth = love.graphics.getWidth()
     local screenHeight = love.graphics.getHeight()
 
-    for _, position, velocity, circle, ball in
+    for entity, position, velocity, circle, _ in
         registry:each(
             "position",
             "velocity",
@@ -40,7 +33,12 @@ function WallCollisionSystem.update(scene, dt)
 
         -- Pared inferior: lose condition
         if position.y - circle.radius >= screenHeight then
-            game.state = "lost"
+            local alreadyOut = registry:get(entity, "outOfBounds")
+
+            if not alreadyOut then
+                registry:add(entity, "outOfBounds", {})
+                registry:spawn({loseRequest = {}})
+            end
         end
     end
 end

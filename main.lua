@@ -1,11 +1,12 @@
 local Scene = require("src.ecs.Scene")
 local GameSetupSystem = require("src.systems.GameSetupSystem")
-local RenderSystem = require("src.systems.RenderSystem")
 local PaddleControlSystem = require("src.systems.PaddleControlSystem")
 local BallMovementSystem = require("src.systems.BallMovementSystem")
 local WallCollisionSystem = require("src.systems.WallCollisionSystem")
 local PaddleCollisionSystem = require("src.systems.PaddleCollisionSystem")
 local BlockCollisionSystem = require("src.systems.BlockCollisionSystem")
+local GameStateSystem = require("src.systems.GameStateSystem")
+local RenderSystem = require("src.systems.RenderSystem")
 
 local scene
 
@@ -17,12 +18,13 @@ function love.load()
 
     -- Sistemas
     scene:addSystem(GameSetupSystem)
-    scene:addSystem(RenderSystem)
     scene:addSystem(PaddleControlSystem)
     scene:addSystem(BallMovementSystem)
     scene:addSystem(WallCollisionSystem)
     scene:addSystem(PaddleCollisionSystem)
     scene:addSystem(BlockCollisionSystem)
+    scene:addSystem(GameStateSystem)
+    scene:addSystem(RenderSystem)
 
     scene:setup()
 
