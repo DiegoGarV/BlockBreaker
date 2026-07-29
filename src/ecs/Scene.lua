@@ -18,6 +18,7 @@
 -- lessons.
 
 local Registry = require("src.ecs.Registry")
+local Canvas = require("src.ui.Canvas")
 
 local Scene = {}
 Scene.__index = Scene
@@ -54,9 +55,15 @@ function Scene:unload()
 end
 
 function Scene:update(dt)
+    local gameplayBlocked = Canvas.blocksGameplay(self.registry)
+
     for _, system in ipairs(self.systems) do
         if system.update then
-            system.update(self, dt)
+            local canRun = not gameplayBlocked or system.runWhenCanvasBlocked
+
+            if canRun then
+                system.update(self, dt)
+            end
         end
     end
 end

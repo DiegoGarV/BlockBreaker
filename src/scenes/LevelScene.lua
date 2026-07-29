@@ -8,13 +8,13 @@ local PaddleCollisionSystem = require("src.systems.PaddleCollisionSystem")
 local BlockCollisionSystem = require("src.systems.BlockCollisionSystem")
 local GameStateSystem = require("src.systems.GameStateSystem")
 local LevelRenderSystem = require("src.systems.LevelRenderSystem")
+local UISystem = require("src.systems.UISystem")
 
 local LevelScene = {}
 
 function LevelScene.new()
     local scene = Scene.new("TestLevel")
 
-    -- Sistemas
     scene:addSystem(GameSetupSystem)
     scene:addSystem(InputSystem)
     scene:addSystem(PaddleControlSystem)
@@ -24,6 +24,7 @@ function LevelScene.new()
     scene:addSystem(BlockCollisionSystem)
     scene:addSystem(GameStateSystem)
     scene:addSystem(LevelRenderSystem)
+    scene:addSystem(UISystem)
 
     return scene
 end

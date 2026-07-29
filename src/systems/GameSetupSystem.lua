@@ -1,3 +1,5 @@
+local Canvas = require("src.ui.Canvas")
+
 local GameSetupSystem = {}
 
 local function createPaddle(registry)
@@ -8,6 +10,8 @@ local function createPaddle(registry)
     local paddleHeight = 20
 
     return registry:spawn({
+        levelEntity = {},
+
         position = {
             x = screenWidth / 2 - paddleWidth / 2,
             y = screenHeight - 60
@@ -35,6 +39,8 @@ local function createBall(registry)
     local screenHeight = love.graphics.getHeight()
 
     return registry:spawn({
+        levelEntity = {},
+
         position = {
             x = screenWidth / 2,
             y = screenHeight - 80
@@ -71,6 +77,8 @@ local function createBlock(
     color
 )
     return registry:spawn({
+        levelEntity = {},
+
         position = {
             x = x,
             y = y
@@ -159,9 +167,9 @@ end
 function GameSetupSystem.reset(scene)
     local registry = scene.registry
 
-    -- Elimina todas las entidades registradas
+    -- Elimina todas las entidades del nivel
     for _, entity in ipairs(
-        registry:query("position")
+        registry:query("levelEntity")
     ) do
         registry:destroy(entity)
     end
@@ -180,11 +188,18 @@ function GameSetupSystem.reset(scene)
         registry:destroy(entity)
     end
 
-    -- Eliminar eventos de teclado
-    for _, entity in ipairs(
-        registry:query("keyPressed")
-    ) do
-        registry:destroy(entity)
+    Canvas.hide(registry, "endScreen")
+
+    local _, endCanvas = Canvas.get(registry, "endScreen")
+
+    if endCanvas then
+        endCanvas.selectedIndex = 1
+    end
+
+    local _, input = registry:first("input")
+
+    if input then
+        input.paddleDirection = 0
     end
 
     registry:spawn({
@@ -211,7 +226,8 @@ function GameSetupSystem.reset(scene)
         {
             top = 40,
             left = 40,
-            right = 40
+            right = 40,
+            bottom = 150
         }
     )
 end
@@ -219,17 +235,71 @@ end
 function GameSetupSystem.setup(scene)
     local registry = scene.registry
 
-    registry:spawn({
-        ui = {
-            titleFont = love.graphics.newFont(48),
-            optionFont = love.graphics.newFont(24)
-        }
+    local screenWidth =
+        love.graphics.getWidth()
+
+    local screenHeight =
+        love.graphics.getHeight()
+
+    local buttonWidth = 220
+    local buttonHeight = 60
+    local spacing = 30
+
+    local totalWidth =
+        buttonWidth * 2 +
+        spacing
+
+    local startX =
+        screenWidth / 2 -
+        totalWidth / 2
+
+    Canvas.create(registry, {
+        id = "endScreen",
+        active = false,
+        interactive = true,
+        blocksGameplay = true,
+        navigation = "horizontal",
+        selectedIndex = 1,
+        priority = 10,
+        dim = 0.65
+    })
+
+    Canvas.createText(registry, {
+        id = "endScreenTitle",
+        canvasId = "endScreen",
+        value = "",
+        font = "title",
+        x = 0,
+        y = screenHeight / 2 - 100,
+        width = screenWidth,
+        align = "center"
+    })
+
+    Canvas.createButton(registry, {
+        canvasId = "endScreen",
+        text = "Replay",
+        action = "restart",
+        index = 1,
+        x = startX,
+        y = screenHeight / 2 + 20,
+        width = buttonWidth,
+        height = buttonHeight
+    })
+
+    Canvas.createButton(registry, {
+        canvasId = "endScreen",
+        text = "Main Menu",
+        action = "mainMenu",
+        index = 2,
+        x = startX +
+            buttonWidth +
+            spacing,
+        y = screenHeight / 2 + 20,
+        width = buttonWidth,
+        height = buttonHeight
     })
 
     GameSetupSystem.reset(scene)
-
-    -- Debug
-    print("GameSetupSystem ejecutado")
 end
 
 return GameSetupSystem

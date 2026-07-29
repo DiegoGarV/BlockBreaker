@@ -1,108 +1,79 @@
+local Canvas = require("src.ui.Canvas")
+
 local MainMenuSetupSystem = {}
-
-local function createButton(
-    registry,
-    text,
-    x,
-    y,
-    width,
-    height
-)
-    return registry:spawn({
-        position = {
-            x = x,
-            y = y
-        },
-
-        rectangle = {
-            width = width,
-            height = height
-        },
-
-        color = {
-            r = 0.2,
-            g = 0.4,
-            b = 0.8
-        },
-
-        outline = {
-            width = 2,
-            color = {
-                r = 1,
-                g = 1,
-                b = 1
-            }
-        },
-
-        button = {
-            text = text
-        }
-    })
-end
 
 function MainMenuSetupSystem.setup(scene)
     local registry = scene.registry
 
     local screenWidth = love.graphics.getWidth()
-    local screenHeight = love.graphics.getHeight()
 
     local buttonWidth = 240
     local buttonHeight = 60
-    local buttonSpacing = 20
-
-    local totalButtonsHeight =
-        buttonHeight * 3 +
-        buttonSpacing * 2
+    local spacing = 20
 
     local startX =
         screenWidth / 2 -
         buttonWidth / 2
 
-    local startY =
-        screenHeight / 2 -
-        totalButtonsHeight / 2 +
-        60
+    local startY = 250
 
-    registry:spawn({
-        menu = {
-            title = "Block Breacker"
-        },
-
-        ui = {
-            titleFont = love.graphics.newFont(52),
-            buttonFont = love.graphics.newFont(24)
-        }
+    Canvas.create(registry, {
+        id = "mainMenu",
+        active = true,
+        interactive = true,
+        navigation = "vertical",
+        selectedIndex = 1
     })
 
-    createButton(
-        registry,
-        "Play",
-        startX,
-        startY,
-        buttonWidth,
-        buttonHeight
-    )
+    Canvas.createText(registry, {
+        id = "mainMenuTitle",
+        canvasId = "mainMenu",
+        value = "Block Breacker",
+        font = "title",
+        x = 0,
+        y = 80,
+        width = screenWidth,
+        align = "center"
+    })
 
-    createButton(
-        registry,
-        "Levels",
-        startX,
-        startY + buttonHeight + buttonSpacing,
-        buttonWidth,
-        buttonHeight
-    )
+    Canvas.createButton(registry, {
+        canvasId = "mainMenu",
+        text = "Play",
+        action = "play",
+        index = 1,
+        active = true,
+        x = startX,
+        y = startY,
+        width = buttonWidth,
+        height = buttonHeight
+    })
 
-    createButton(
-        registry,
-        "Quit",
-        startX,
-        startY +
-            (buttonHeight + buttonSpacing) * 2,
-        buttonWidth,
-        buttonHeight
-    )
+    Canvas.createButton(registry, {
+        canvasId = "mainMenu",
+        text = "Levels",
+        action = "levels",
+        index = 2,
+        active = false,
+        x = startX,
+        y = startY +
+            buttonHeight +
+            spacing,
+        width = buttonWidth,
+        height = buttonHeight
+    })
 
-    print("Main Menu ejecutado")
+    Canvas.createButton(registry, {
+        canvasId = "mainMenu",
+        text = "Quit",
+        action = "quit",
+        index = 3,
+        active = true,
+        x = startX,
+        y = startY +
+            (buttonHeight + spacing) * 2,
+        width = buttonWidth,
+        height = buttonHeight
+    })
 end
 
 return MainMenuSetupSystem

@@ -2,8 +2,9 @@ local LevelRenderSystem = {}
 
 local function drawGame(registry)
     -- Dibuja paddle y bloques
-    for entity, position, rectangle, color in
+    for entity, _, position, rectangle, color in
         registry:each(
+            "levelEntity",
             "position",
             "rectangle",
             "color"
@@ -45,8 +46,9 @@ local function drawGame(registry)
     end
 
     -- Dibuja la pelota
-    for _, position, circle, color in
+    for _, _, position, circle, color in
         registry:each(
+            "levelEntity",
             "position",
             "circle",
             "color"
@@ -67,85 +69,14 @@ local function drawGame(registry)
     end
 end
 
-local function drawEndScreen(registry, message, messageColor)
-    local screenWidth = love.graphics.getWidth()
-    local screenHeight = love.graphics.getHeight()
-
-    local _, ui = registry:first("ui")
-
-    if not ui then
-        -- Debug
-        print("Error: no se encontró UI")
-        return
-    end
-
-    -- Mensaje principal
-    love.graphics.setFont(ui.titleFont)
-    love.graphics.setColor(
-        messageColor[1],
-        messageColor[2],
-        messageColor[3]
-    )
-
-    love.graphics.printf(
-        message,
-        0,
-        screenHeight / 2 - 100,
-        screenWidth,
-        "center"
-    )
-
-    -- Opciones
-    love.graphics.setFont(ui.optionFont)
-    love.graphics.setColor(1, 1, 1)
-
-    love.graphics.printf(
-        "Press 'R' to replay",
-        0,
-        screenHeight / 2,
-        screenWidth,
-        "center"
-    )
-
-    love.graphics.printf(
-        "Press 'Q' to quit",
-        0,
-        screenHeight / 2 + 50,
-        screenWidth,
-        "center"
-    )
-end
-
 function LevelRenderSystem.draw(scene)
-    local registry = scene.registry
+    love.graphics.clear(
+        0.1,
+        0.1,
+        0.15
+    )
 
-    love.graphics.clear(0.1, 0.1, 0.15)
-
-    local _, game = registry:first("game")
-
-    if not game then
-        -- Debug
-        print("Error: no se encontró el estado del juego")
-        return
-    end
-
-    if game.state == "playing" then
-        drawGame(registry)
-
-    elseif game.state == "won" then
-        drawEndScreen(
-            registry,
-            "You Win!",
-            {0.2, 1, 0.3}
-        )
-
-    elseif game.state == "lost" then
-        drawEndScreen(
-            registry,
-            "Game Over",
-            {1, 0.2, 0.2}
-        )
-    end
+    drawGame(scene.registry)
 
     love.graphics.setColor(1, 1, 1)
     love.graphics.setLineWidth(1)

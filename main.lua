@@ -1,30 +1,29 @@
+local SceneManager = require("src.ecs.SceneManager")
 local MainMenuScene = require("src.scenes.MainMenuScene")
-
-local currentScene
+local LevelScene = require("src.scenes.LevelScene")
 
 function love.load()
     love.window.setTitle("Block Breaker")
     love.window.setMode(800, 600)
 
-    currentScene = MainMenuScene.new()
-    currentScene:setup()
-    print("Escena creada: " .. currentScene.name)
+    SceneManager.register("mainMenu", MainMenuScene.new)
+    SceneManager.register("testLevel", LevelScene.new)
+
+    SceneManager.change("mainMenu")
 end
 
 function love.update(dt)
-    currentScene:update(dt)
+    SceneManager.update(dt)
 end
 
 function love.keypressed(key)
-    currentScene.registry:spawn({keyPressed = {key = key}})
+    SceneManager.keypressed(key)
 end
 
 function love.draw()
-    currentScene:draw()
+    SceneManager.draw()
 end
 
 function love.quit()
-    if currentScene then
-        currentScene:unload()
-    end
+    SceneManager.unload()
 end
