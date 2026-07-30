@@ -1,0 +1,1 @@
+![Demostración del juego](example.gif)
